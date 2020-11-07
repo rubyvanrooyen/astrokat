@@ -5,6 +5,7 @@ import numpy
 import time
 import yaml
 
+from . import obs_dict
 
 class NotAllTargetsUpError(Exception):
     """Raise error when not all targets are at the desired horizon.
@@ -106,29 +107,22 @@ def timestamp2datetime(timestamp):
 
 def katpoint_target(target_item):
     """Construct an expected katpoint target from a target_item string."""
-    coords = ["radec", "azel", "gal"]
-    # input string format: name=, radec=, tags=, duration=, ...
-    target_ = [item.strip() for item in target_item.split(",")]
-    for item_ in target_:
-        prefix = "name="
-        if item_.startswith(prefix):
-            name = item_[len(prefix) :]
-        prefix = "tags="
-        if item_.startswith(prefix):
-            tags = item_[len(prefix) :]
-        prefix = "model="
-        if item_.startswith(prefix):
-            fluxmodel = item_[len(prefix) :]
-        else:
-            fluxmodel = ()
-        for coord in coords:
-            prefix = coord + "="
-            if item_.startswith(prefix):
-                ctag = coord
-                x = item_[len(prefix) :].split()[0].strip()
-                y = item_[len(prefix) :].split()[1].strip()
-                break
-    target = "{}, {} {}, {}, {}, {}".format(name, ctag, tags, x, y, fluxmodel)
+    target_ = obs_dict.unpack_target(target_item)
+    name = target_['name']
+    fluxmodel = target_['flux_model']
+    if fluxmodel is None:
+        fluxmodel = ()
+    ctag = target_['coord'][0]
+    if 'special' in ctag:
+        x, y = '', ''
+    else:
+        x, y = target_['coord'][1].split()
+    target = "{}, {} {}, {}, {}, {}".format(name,
+                                            ctag,
+                                            target_['tags'],
+                                            x.strip(),
+                                            y.strip(),
+                                            fluxmodel)
     return name, target
 
 
