@@ -1,0 +1,42 @@
+{
+    "name": "",
+    "id": 0,
+    "description": null,
+    "proposal_id": "",
+    "state": "DRAFT",
+    "owner": "",
+    "sb_id": 0,
+    "calendar_event_url": "",
+    "instrument": {
+        "enabled": false,
+        "product": "",
+        "dump_rate": "",
+        "band": "",
+        "pool_resources": [
+            "cbf",
+            "sdp"
+        ]
+    },
+    "noise_diode": {
+        "enabled": false,
+        "pattern": "all",
+        "on_fraction": null,
+        "cycle_len": null
+    },
+    "horizon": 20,
+    "lst_start": "0",
+    "lst_start_end": null,
+    "desired_start_time": null,
+    "duration": "",
+    "blocks": [
+        {
+            "name": "Block",
+            "repeat": 1,
+            "targets": []
+        }
+    ],
+    "activities": [],
+    "flux_bandpass_calibrators": [],
+    "polarisation_calibrators": [],
+    "isYamlObservation": "false"
+}
