@@ -4,3 +4,4 @@ python -m unittest astrokat.test.test_offline_observe.TestAstrokatYAML.test_two_
 python -m unittest astrokat.test.test_offline_observe.TestAstrokatYAML.test_image_single_sim
 python -m unittest astrokat.test.test_offline_observe.TestAstrokatYAML.test_image_sim
 python -m unittest astrokat.test.test_offline_observe.TestAstrokatYAML.test_below_horizon
+python -m unittest astrokat.test.test_offline_observe.TestAstrokatYAML.test_time_conversion_symmetry
