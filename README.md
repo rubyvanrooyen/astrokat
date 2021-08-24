@@ -35,12 +35,12 @@ To enable auto-complete of the long python input arguments, install `argcomplete
 pip install argcomplete
 `
 
-Activate argument auto-complete for a helper script
+Activate argument auto-complete for a helper script    
 `
 eval "$(register-python-argcomplete astrokat-catalogue2obsfile.py)"
 `
 
-This will enable completion in Bash.  To try it out, do:
+This will enable completion in Bash.  To try it out, do:    
 `
 astrokat-catalogue2obsfile.py <TAB><TAB>
 `
