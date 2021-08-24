@@ -31,17 +31,17 @@ Dependencies:
 
 Helper script input arguments follow a very verbose naming convention.
 To enable auto-complete of the long python input arguments, install `argcomplete` python library    
-````
+`
 pip install argcomplete
-```
+`
 Activate argument auto-complete for a helper script
-```
+`
 eval "$(register-python-argcomplete astrokat-catalogue2obsfile.py)"
-```
+`
 This will enable completion in Bash.  To try it out, do:
-```
+`
 astrokat-catalogue2obsfile.py <TAB><TAB>
-```
+`
 This should display all you argument options
 
 
