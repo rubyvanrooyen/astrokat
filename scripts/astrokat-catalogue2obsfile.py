@@ -329,7 +329,8 @@ if __name__ == "__main__":
             }
             instrument = vars(argparse.Namespace(**group_dict))
             break
-    for key in instrument.keys():
+    instrument_dict_keys = list(instrument.keys())
+    for key in instrument_dict_keys:
         if instrument[key] is None:
             del instrument[key]
 
