@@ -56,6 +56,27 @@ else
     exit
 fi
 
+echo
+$CMD --infile test_convert/lunar.csv --product c856M4k --target-duration 904 --max-duration 28800 --primary-cal-duration 296 --primary-cal-cadence 3600 --secondary-cal-duration 128
+ret=$?
+if [ "0" -eq "$ret" ]
+then
+    echo -e "${GREEN} Success ${NOCOLOR}"
+else
+    echo -e "${RED} Failure ${NOCOLOR}"
+    exit
+fi
+
+echo
+$CMD --infile test_convert/comet_Y1.csv --product c856M32k --target-duration 900 --max-duration 5400 --primary-cal-duration 300 --primary-cal-cadence 3600 --secondary-cal-duration 90
+ret=$?
+if [ "0" -eq "$ret" ]
+then
+    echo -e "${GREEN} Success ${NOCOLOR}"
+else
+    echo -e "${RED} Failure ${NOCOLOR}"
+    exit
+fi
 
 # -fin-
 

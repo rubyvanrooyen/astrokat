@@ -36,6 +36,17 @@ else
     echo -e "${RED} Failure ${NOCOLOR}"
     exit
 fi
+echo "Catalogue created"
+comparefile='test_cals/AR1_mosaic_NGC641_output_compare.csv'
+diff $outfile $comparefile
+ret=$?
+if [ "0" -eq "$ret" ]
+then
+    echo -e "${GREEN} Success ${NOCOLOR}"
+else
+    echo -e "${RED} Failure ${NOCOLOR}"
+    exit
+fi
 
 echo
 $CMD --view $outfile --text-only --solar-angle=55 --datetime "$DATE" --lst
@@ -51,6 +62,29 @@ fi
 echo
 infile='test_cals/sample_targetlist_for_cals.yaml'
 $CMD --view $infile --text-only  --datetime "$DATE"
+ret=$?
+if [ "0" -eq "$ret" ]
+then
+    echo -e "${GREEN} Success ${NOCOLOR}"
+else
+    echo -e "${RED} Failure ${NOCOLOR}"
+    exit
+fi
+
+echo
+infile='test_cals/sample_comet_def.csv'
+$CMD --infile $infile --cal-tags gain flux --text-only --datetime "$DATE"
+ret=$?
+if [ "0" -eq "$ret" ]
+then
+    echo -e "${GREEN} Success ${NOCOLOR}"
+else
+    echo -e "${RED} Failure ${NOCOLOR}"
+    exit
+fi
+
+echo
+$CMD --body Moon --cal-tags gain flux --lst --text-only
 ret=$?
 if [ "0" -eq "$ret" ]
 then

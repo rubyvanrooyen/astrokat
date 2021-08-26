@@ -16,8 +16,14 @@ image-single-sim
 image-sim
 # more calibrator imaging
 image-cals-sim
+# solar system bodies
+solar-sim
+# helio orbiting xephem target
+comet-sim
 # exit when targets are below horizon
-below-horizon-sim)
+below-horizon-sim
+# multiple obs loops over multi-lst ranges
+multi-lst-sim)
 
 for infile in ${INPUT[@]}
 do
