@@ -52,9 +52,12 @@ def read_yaml(filename):
         if "start_time" in data["durations"]:
             start_time = data["durations"]["start_time"]
             if isinstance(start_time, str):
-                data["durations"]["start_time"] = datetime.datetime.strptime(
+                start_time = datetime.datetime.strptime(
                     start_time, "%Y-%m-%d %H:%M"
                 )
+            elif isinstance(start_time, datetime.datetime):
+                start_time = start_time.replace(tzinfo=None)
+            data["durations"]["start_time"] = start_time
     if "observation_loop" not in data.keys():
         raise RuntimeError("Nothing to observe, exiting")
     if data["observation_loop"] is None:
@@ -91,7 +94,7 @@ def datetime2timestamp(datetime_obj):
 
     """
     epoch = datetime.datetime.utcfromtimestamp(0)
-    return (datetime_obj.replace(tzinfo=None) - epoch).total_seconds()
+    return (datetime_obj - epoch).total_seconds()
 
 
 def timestamp2datetime(timestamp):
@@ -104,35 +107,7 @@ def timestamp2datetime(timestamp):
     return datetime.datetime.utcfromtimestamp(timestamp)
 
 
-def katpoint_target(target_item):
-    """Construct an expected katpoint target from a target_item string."""
-    coords = ["radec", "azel", "gal"]
-    # input string format: name=, radec=, tags=, duration=, ...
-    target_ = [item.strip() for item in target_item.split(",")]
-    for item_ in target_:
-        prefix = "name="
-        if item_.startswith(prefix):
-            name = item_[len(prefix) :]
-        prefix = "tags="
-        if item_.startswith(prefix):
-            tags = item_[len(prefix) :]
-        prefix = "model="
-        if item_.startswith(prefix):
-            fluxmodel = item_[len(prefix) :]
-        else:
-            fluxmodel = ()
-        for coord in coords:
-            prefix = coord + "="
-            if item_.startswith(prefix):
-                ctag = coord
-                x = item_[len(prefix) :].split()[0].strip()
-                y = item_[len(prefix) :].split()[1].strip()
-                break
-    target = "{}, {} {}, {}, {}, {}".format(name, ctag, tags, x, y, fluxmodel)
-    return name, target
-
-
-def get_lst(yaml_lst):
+def get_lst(yaml_lst, multi_loop=False):
     """Extract lst range from YAML key.
 
     Get the Local Sidereal Time range for when a celestial body can be observed
@@ -167,7 +142,7 @@ def get_lst(yaml_lst):
         time_ = datetime.datetime.strptime("{}".format(start_lst), "%H:%M").time()
         start_lst = time_.hour + time_.minute / 60.0
 
-    if end_lst is None:
+    if not multi_loop and end_lst is None:
         end_lst = (start_lst + 24.0) % 24.0
         if numpy.abs(end_lst - start_lst) < 1.0:
             end_lst = 24.0
@@ -220,11 +195,11 @@ def lst2utc(req_lst, ref_location, date=None):
     [time_range, lst_range] = get_lst_range(date)
     lst_idx = numpy.abs(lst_range - req_lst).argmin()
     if lst_range[lst_idx] < req_lst:
-        x = lst_range[lst_idx : lst_idx + 2]
-        y = time_range[lst_idx : lst_idx + 2]
+        x = lst_range[lst_idx:lst_idx + 2]
+        y = time_range[lst_idx:lst_idx + 2]
     else:
-        x = lst_range[lst_idx - 1 : lst_idx + 1]
-        y = time_range[lst_idx - 1 : lst_idx + 1]
+        x = lst_range[lst_idx - 1:lst_idx + 1]
+        y = time_range[lst_idx - 1:lst_idx + 1]
     linefit = numpy.poly1d(numpy.polyfit(x, y, 1))
     return datetime.datetime.utcfromtimestamp(linefit(req_lst))
 

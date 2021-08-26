@@ -2,17 +2,16 @@
 from __future__ import division
 from __future__ import absolute_import
 
-import os
-import json
 import ephem
-import numpy
+import json
 import katpoint
-
+import numpy
+import os
 
 from datetime import datetime, timedelta
 
 from .simulate import user_logger, setobserver
-from .utility import katpoint_target
+from .targets import katpoint_target_string
 
 try:
     import katconf
@@ -180,23 +179,8 @@ class Observatory(object):
             Names and descriptions of target(s) which can be pointed at by an antenna
 
         """
-        name, target_item = katpoint_target(target_item)
+        name, target_item = katpoint_target_string(target_str=target_item)
         return self.set_target(target_item)
-
-    def unpack_target(self, target_item):
-        """Unpack full description of target.
-
-        Parameters
-        -----------
-        target_item: str
-            Names and descriptions of target(s) which can be pointed at by an antenna
-
-        """
-        target_dict = {}
-        for item in target_item.split(","):
-            item_ = item.strip().split("=")
-            target_dict[item_[0].strip()] = item_[1].strip()
-        return target_dict
 
     def lst2hours(self, ephem_lst):
         """Convert time format from ephem LST time to number of hours since epoch.
@@ -232,7 +216,16 @@ class Observatory(object):
         for target in target_list:
             target_ = self.get_target(target).body
             start_lst.append(self._ephem_risetime_(target_))
-        start_lst = start_lst[numpy.asarray(start_lst, dtype=float).argmin()]
+
+        start_lst_float = numpy.asarray(start_lst, dtype=float)
+        idx_map = (start_lst_float >= 1)
+        if numpy.any(idx_map):
+            start_lst_float = start_lst_float[idx_map]
+            start_lst = [start_lst[c_] for c_, i_ in enumerate(idx_map) if i_]
+            start_lst = start_lst[start_lst_float.argmin()]
+        else:
+            start_lst = start_lst[start_lst_float.argmin()]
+
         if str_flag:
             return str(start_lst)
         return self.lst2hours(start_lst)
@@ -251,10 +244,22 @@ class Observatory(object):
 
         """
         end_lst = []
+        end_lst_float = []
         for target in target_list:
             target_ = self.get_target(target).body
+            start_lst = self._ephem_risetime_(target_)
             end_lst.append(self._ephem_settime_(target_))
-        end_lst = end_lst[numpy.asarray(end_lst, dtype=float).argmax()]
+            end_lst_float.append(float(end_lst[-1]))
+            if start_lst > end_lst[-1]:
+                end_lst_float[-1] += 24.
+        idx_map = (numpy.asarray(end_lst_float) % 24. <= 2. * numpy.pi)
+        end_lst_float = numpy.asarray(end_lst_float, dtype=float)
+        if numpy.any(idx_map):
+            end_lst_float = end_lst_float[idx_map]
+            end_lst = [end_lst[c_] for c_, i_ in enumerate(idx_map) if i_]
+            end_lst = end_lst[end_lst_float.argmin()]
+        else:
+            end_lst = end_lst[end_lst_float.argmax()]
         if str_flag:
             return str(end_lst)
         return self.lst2hours(end_lst)
